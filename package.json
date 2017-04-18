@@ -1,0 +1,35 @@
+{
+  "name": "gateway",
+  "version": "0.0.1",
+  "main": "app.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arthur Milliken",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "connect-ensure-login": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.1",
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "mongoose": "^4.9.4",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arthurmilliken/gateway.git"
+  },
+  "keywords": [
+    "passport"
+  ],
+  "bugs": {
+    "url": "https://github.com/arthurmilliken/gateway/issues"
+  },
+  "homepage": "https://github.com/arthurmilliken/gateway#readme",
+  "description": ""
+}

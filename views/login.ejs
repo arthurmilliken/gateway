@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h1>login</h1>
+	<% if (error.length > 0) { %>
+		<ul class='error'>
+		<% error.forEach(item => { %>
+			<li><%= item %></li>
+		<% }); %>
+		</ul>
+	<% } %>
+
+	<form method="post" action="/login">
+	<table>
+		<tr><th>username: </th><td><input name='username' type="text" /></td></tr>
+		<tr><th>password: </th><td><input name='password' type="password" /></td></tr>
+		<tr><th>&nbsp;</th><td><input type="submit" /></td></tr>
+	</table>
+	</form>
+</body>
+</html>
