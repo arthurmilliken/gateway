@@ -37,8 +37,6 @@ jspm_packages
 .node_repl_history
 
 .env
-.env.sh
-.vagrant
 secrets
 _ignore
 

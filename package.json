@@ -13,11 +13,17 @@
     "connect-ensure-login": "^0.1.1",
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.1",
+    "dotenv": "^4.0.0",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
+    "lodash": "^4.17.4",
     "mongoose": "^4.9.4",
+    "oauth2orize": "^1.8.0",
     "passport": "^0.3.2",
-    "passport-local": "^1.0.0"
+    "passport-http": "^0.3.0",
+    "passport-http-bearer": "^1.0.1",
+    "passport-local": "^1.0.0",
+    "passport-oauth2-client-password": "^0.1.2"
   },
   "devDependencies": {},
   "repository": {

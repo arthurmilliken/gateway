@@ -20,6 +20,7 @@
   "sub": true,
   "maxlen": 120,
   "mocha": true,
+  "camelcase": false,
   "predef": [
     "-Promise",
     "-context"
