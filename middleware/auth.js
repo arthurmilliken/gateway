@@ -10,9 +10,6 @@ const
 
 module.exports = function (options) {
 
-  const defaults = {
-  };
-
   const oauthServer = options.oauthServer || require('oauth2orize').createServer();
 
   const USER = {
@@ -29,6 +26,15 @@ module.exports = function (options) {
     scope: '*'
   };
 
+  const authenticateUser = (user, pass, done) => {
+    if (user === 'arthur' && pass === 'password')
+      done(null, USER);
+    else done(null, false);
+  };
+
+  const authenticateClient = (id, secret, done) => {
+
+  };
 
   oauthServer.serializeClient((client, done) => {
     debug(`oauthServer.serializeClient:${client}`);
@@ -40,30 +46,32 @@ module.exports = function (options) {
     return done(null, client);
   });
 
-  oauthServer.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, done) {
-    debug(`oauthServer.exchange:clientCredentials:${JSON.stringify(client)}`);
+  oauthServer.exchange(oauth2orize.exchange.clientCredentials(
+    (client, scope, done) => {
+      debug(`oauthServer.exchange:clientCredentials:${JSON.stringify(client)}`);
       return done(null, 'TOKEN', { expires_in: 1800, scope: '*' });
-  }));
+    }
+  ));
 
-  const authenticate = (user, pass, done) => {
-    if (user === 'arthur' && pass === 'password')
-      done(null, USER);
-    else done(null, false);
-  };
+  oauthServer.exchange(oauth2orize.exchange.password(
+    (client, username, password, scope, done) => {
+
+    }
+  ));
 
   passport.use(new LocalStrategy((user, pass, done) => {
     debug(`LocalStrategy:${user}:${pass}`);
-    authenticate(user, pass, done);
+    authenticateUser(user, pass, done);
   }));
 
-  passport.use(new BasicStrategy((user, pass, done) => {
-    debug(`BasicStrategy:${user}:${pass}`);
-    authenticate(user, pass, done);
+  passport.use(new BasicStrategy((clientId, clientSecret, done) => {
+    debug(`BasicStrategy:${clientId}:${clientSecret}`);
+    authenticateClient(clientId, clientSecret, done);
   }));
 
   passport.use(new ClientPasswordStrategy((clientId, clientSecret, done) => {
     debug(`ClientPasswordStrategy:${clientId}:${clientSecret}`);
-    authenticate(clientId, clientSecret, done);
+    authenticateClient(clientId, clientSecret, done);
   }));
 
   passport.use(new BearerStrategy((token, done) => {

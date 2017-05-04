@@ -4,7 +4,7 @@ const
   bodyParser = require('body-parser'),
   debug = require('debug')('gateway:app'),
   fs = require('fs'),
-  env = require('./lib/util.js').env,
+  env = require('./lib/util').env,
   app = require('express')(),
   oauthServer = require('oauth2orize').createServer()
 ;
@@ -18,10 +18,10 @@ app.use(require('cookie-session')({
   maxAge: env.getInt('COOKIE_AGE_SECS', 0) * 1000 // 24 hours
 }));
 app.use(require('connect-flash')());
-app.use(require('./middleware/auth.js')({ oauthServer }));
-app.use('/', require('./routes/index.js')());
-app.use('/api', require('./routes/api.js')());
-app.use('/oauth', require('./routes/oauth.js')({ oauthServer }));
+app.use(require('./middleware/auth')({ oauthServer }));
+app.use('/', require('./routes/index')());
+app.use('/api', require('./routes/api')());
+app.use('/oauth', require('./routes/oauth')({ oauthServer }));
 
 app.set('view engine', 'ejs');
 

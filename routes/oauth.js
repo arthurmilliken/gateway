@@ -1,7 +1,6 @@
 const 
   ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn, 
   passport = require('passport'),
-
   query2body = require('../middleware/query2body.js')
 ;
 
