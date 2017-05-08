@@ -22,7 +22,6 @@
   "mocha": true,
   "camelcase": false,
   "predef": [
-    "-Promise",
     "-context"
   ]
 }

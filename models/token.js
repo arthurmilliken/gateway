@@ -15,4 +15,3 @@ schema.index({ owner_id: 1, owner_type: 1 });
 schema.plugin(require('mongoose-createdmodified').createdModifiedPlugin);
 
 module.exports = db.model('Token', schema);
-

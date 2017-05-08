@@ -1,12 +1,19 @@
-const 
+const
+  bcrypt = require('bcryptjs'),
+  co = require('co'),
   debug = require('debug')('gateway:auth'),
   merge = require('merge'),
   oauth2orize = require('oauth2orize'),
   passport = require('passport'),
+
   BasicStrategy = require('passport-http').BasicStrategy,
   BearerStrategy = require('passport-http-bearer').Strategy,
   ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy,
-  LocalStrategy = require('passport-local').Strategy;
+  LocalStrategy = require('passport-local').Strategy,
+
+  models = require('../models'),
+  User = models.User
+;
 
 module.exports = function (options) {
 
@@ -26,8 +33,16 @@ module.exports = function (options) {
     scope: '*'
   };
 
-  const authenticateUser = (user, pass, done) => {
-    if (user === 'arthur' && pass === 'password')
+  const authenticateUser = (username, password, done) => {
+    co(function*() {
+      let user = User.findOne({ username });
+      let valid = false;
+      if (user) valid = yield bcrypt.compare(password, user.password);
+      else yield bcrypt.hash(''); // protect against timing attacks.
+    });
+
+
+    if (username === 'arthur' && password === 'password')
       done(null, USER);
     else done(null, false);
   };

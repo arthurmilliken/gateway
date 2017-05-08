@@ -1,3 +1,4 @@
+global.Promise = require('bluebird');
 require('dotenv').config();
 
 const
@@ -24,6 +25,9 @@ app.use('/api', require('./routes/api')());
 app.use('/oauth', require('./routes/oauth')({ oauthServer }));
 
 app.set('view engine', 'ejs');
+
+// Initialize app.
+require('./lib/boot')();
 
 // const PORT = process.env.PORT || 3001;
 // app.listen(PORT, () => {
