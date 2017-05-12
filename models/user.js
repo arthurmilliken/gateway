@@ -1,6 +1,7 @@
 const
   _ = require('lodash'),
   bcrypt = require('bcrypt'),
+  bluebird = require('bluebird'),
   co = require('co'),
   debug = require('debug')('gateway:user'),
   uid = require('uid-safe'),
@@ -13,6 +14,8 @@ const
   Schema = db.Schema,
   BCRYPT_ROUNDS = 10
 ;
+
+const pwRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
 // User
 const schema = new Schema({
@@ -27,69 +30,48 @@ const schema = new Schema({
   password: {
     type: String, index: true, required: true,
     validate: [
-      v => /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/.test(v),
+      v => pwRegex.test(v),
       '{PATH} must have: length > 8, upper > 1, lower > 1, numeric > 1'
     ]
   },
   fullname: String,
   roles: [String],
   info: db.Schema.Types.Mixed
+}, { timestamps: db.timestamps });
+
+// Use to "fake" password verification delay when no user found.
+schema.statics.fakeVerify = bluebird.promisify((cb) => {
+  if (this.fakeDelay > 0)
+    return setTimeout(() => cb(null, false), this.fakeDelay);
+  let start = Date.now();
+  bcrypt.hash('', BCRYPT_ROUNDS, () => {
+    this.fakeDelay = Date.now() - start;
+    debug('user.fakeVerify:set fakeDelay:', this.fakeDelay);
+    cb(null, false);
+  });
 });
 
-schema.plugin(require('mongoose-createdmodified').createdModifiedPlugin);
-
-const hashProperty = (obj, property, next) => {
-  bcrypt.hash(obj[property], BCRYPT_ROUNDS)
-  .then(hash => {
-    obj[property] = hash;
-    next();
-  }, next);
-};
-
-const onUpdate = function(next) {
-  debug('User.onUpdate:');
-  if (this.model.modelName === 'User' && this._update['password'])
-    hashProperty(this._update, 'password', next);
-  else next();
-};
-
-// Define static methods.
-schema.statics.fakeVerify = function(cb) {
-  return bcrypt.hash('', BCRYPT_ROUNDS, cb);
-};
-
-// Define instance methods.
-schema.methods.verifyPassword = function(password, cb) {
+// Verify a user's password.
+schema.methods.verifyPassword = function (password, cb) {
   if (!this.password) {
     let err = new Error('user: missing password property.');
-    if (_.isFunction(cb)) cb(err);
-    else throw err;
+    if (_.isFunction(cb)) return cb(err);
+    else return Promise.reject(err);
   }
   return bcrypt.compare(password, this.password, cb);
 };
 
-
-
-// Define middleware hooks
-schema.pre('save', function(next) {
-  debug('user:save', this);
+// Hash a user's password before saving.
+schema.pre('save', function (next) {
   let user = this;
+  debug('user:save', user);
   if (!user.isModified('password')) return next();
-  hashProperty(user, 'password', next);
+  bcrypt.hash(user.password, BCRYPT_ROUNDS)
+  .then(hash => {
+    user.password = hash;
+    next();
+  }, next);
 });
-schema.pre('update', onUpdate);
-schema.pre('findOneAndUpdate', onUpdate);
 
 const User = module.exports = db.model('User', schema);
 
-const duplicateKeyError = {
-  name: 'MongoError',
-  message: 'E11000 duplicate key error collection: gateway.users index: username_1 dup key: { : "arthur1" }',
-  driver: true,
-  code: 11000,
-  index: 0,
-  errmsg: 'E11000 duplicate key error collection: gateway.users index: username_1 dup key: { : "arthur1" }',
-  getOperation: Function,
-  toJson: Function,
-  toString: Function   
-};

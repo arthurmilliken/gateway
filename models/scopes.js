@@ -20,13 +20,13 @@ module.exports = {
   'token:admin': {
     description: 'Ability to create, edit or delete any token.',
   },
+  'token:validate': {
+    description: 'Ability to validate tokens.',
+  },
   'resource': {
     description: 'Ability to find, create, edit or delete own resources.',
   },
   'resource:admin': {
     description: 'Ability to find, create, edit or delete any resources.',
-  },
-  'ipfs': {
-    description: 'permission to use ipfs gateway and api.',
-  },
+  }
 };
